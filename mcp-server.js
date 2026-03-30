@@ -1,8 +1,13 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import dotenv from 'dotenv';
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: join(__dirname, '.env') });
 const SUPABASE_URL = "https://xkbmtdalqtfmabvqymxv.supabase.co";
 const SUPABASE_KEY = process.env.SUPABASE_KEY;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
