@@ -1,0 +1,9 @@
+node_modules/
+.env
+*.log
+.git/
+.claude/
+docs/
+tests/
+CLAUDE.md
+README.md
