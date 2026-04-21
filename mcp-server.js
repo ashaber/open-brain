@@ -147,6 +147,22 @@ function createMcpServer() {
 const app = express();
 app.use(express.json());
 
+// Bearer token auth
+const MCP_AUTH_TOKEN = process.env.MCP_AUTH_TOKEN;
+if (!MCP_AUTH_TOKEN) {
+  log.warn('MCP_AUTH_TOKEN not set — endpoint is unauthenticated');
+}
+
+app.use('/mcp', (req, res, next) => {
+  if (!MCP_AUTH_TOKEN) return next();
+  const auth = req.headers['authorization'] ?? '';
+  if (auth !== `Bearer ${MCP_AUTH_TOKEN}`) {
+    log.warn('unauthorized request rejected', { ip: req.ip });
+    return res.status(401).json({ error: 'unauthorized' });
+  }
+  next();
+});
+
 app.use('/mcp', async (req, res) => {
   const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
   const server = createMcpServer();

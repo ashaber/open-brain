@@ -11,17 +11,20 @@ Then run:
     python tests/test_mcp_http.py --verbose
 """
 
-import argparse, json, sys, time, uuid
+import argparse, json, os, sys, time, uuid
 import requests
 
 DEFAULT_URL = "http://localhost:3000"
 TIMEOUT = 15
 
 def rpc(base_url, method, params=None, req_id=1):
+    token = os.environ.get('MCP_AUTH_TOKEN', '')
+    headers = {"Content-Type": "application/json", "Accept": "application/json, text/event-stream"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
     payload = {"jsonrpc": "2.0", "id": req_id, "method": method, "params": params or {}}
     resp = requests.post(f"{base_url}/mcp", json=payload,
-                         headers={"Content-Type": "application/json",
-                                  "Accept": "application/json, text/event-stream"},
+                         headers=headers,
                          timeout=TIMEOUT, stream=True)
     resp.raise_for_status()
     if "text/event-stream" in resp.headers.get("content-type", ""):
