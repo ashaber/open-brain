@@ -13,12 +13,16 @@ Then run:
 
 import argparse, json, os, sys, time, uuid
 import requests
+from dotenv import load_dotenv
+load_dotenv()
 
 DEFAULT_URL = "http://localhost:3000"
 TIMEOUT = 15
 
-def rpc(base_url, method, params=None, req_id=1):
+def rpc(base_url, method, params=None, req_id=1, verbose=False):
     token = os.environ.get('MCP_AUTH_TOKEN', '')
+    if verbose:
+        print(f"token = {token}|")
     headers = {"Content-Type": "application/json", "Accept": "application/json, text/event-stream"}
     if token:
         headers["Authorization"] = f"Bearer {token}"
@@ -62,7 +66,7 @@ class TestRunner:
     def test_tools_list(self):
         expected = {"search_memory", "store_memory", "list_recent"}
         try:
-            data = rpc(self.base_url, "tools/list")
+            data = rpc(self.base_url, "tools/list", verbose=self.verbose)
             self.show("tools/list", data)
             tools = {t["name"] for t in data.get("result", {}).get("tools", [])}
             missing = expected - tools
